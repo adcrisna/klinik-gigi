@@ -1,0 +1,253 @@
+@extends('layouts.petugas')
+@section('css')
+    <link rel="stylesheet" href="{{ asset('adminlte/plugins/datatables/dataTables.bootstrap.css') }}">
+    <style>
+        img.zoom {
+            width: 130px;
+            height: 100px;
+            -webkit-transition: all .2s ease-in-out;
+            -moz-transition: all .2s ease-in-out;
+            -o-transition: all .2s ease-in-out;
+            -ms-transition: all .2s ease-in-out;
+        }
+
+        .transisi {
+            -webkit-transform: scale(1.8);
+            -moz-transform: scale(1.8);
+            -o-transform: scale(1.8);
+            transform: scale(1.8);
+        }
+    </style>
+@endsection
+
+@section('content')
+    <section class="content-header">
+        <ol class="breadcrumb">
+            <li><a href="{{ route('petugas.index') }}"><i class="fa fa-home"></i> Home</a></li>
+            <li class="active">Data Booking</li>
+        </ol>
+        <br />
+    </section>
+    <section class="content">
+        @if (\Session::has('msg_success'))
+            <h5>
+                <div class="alert alert-info">
+                    {{ \Session::get('msg_success') }}
+                </div>
+            </h5>
+        @endif
+        @if (\Session::has('msg_error'))
+            <h5>
+                <div class="alert alert-danger">
+                    {{ \Session::get('msg_error') }}
+                </div>
+            </h5>
+        @endif
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Data Booking Hari ini</h3>
+                        <div class="box-tools pull-right">
+                            {{-- <button type="button" class="btn btn-info btn-md" data-toggle="modal"
+                                data-target="#modal-form-tambah-klinik"><i class="fa fa-plus"> Tambah Data
+                                </i></button> --}}
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive">
+                        <table class="table table-bordered table-striped" id="data-booking">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama Pasien</th>
+                                    <th>No Handphone</th>
+                                    <th>Klinik</th>
+                                    <th>Service</th>
+                                    <th>Tanggal</th>
+                                    <th>Jam</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (@$booking as $key => $value)
+                                    <tr>
+                                        <td>{{ @$value->id }}</td>
+                                        <td>{{ @$value->Pasien->name }}</td>
+                                        <td>{{ @$value->Pasien->no_hp }}</td>
+                                        <td>{{ @$value->Klinik->name }}</td>
+                                        <td>{{ @$value->Service->name }}</td>
+                                        <td>{{ @$value->tanggal }}</td>
+                                        <td>{{ @$value->jam }}</td>
+                                        <td>
+                                            <a href="{{ route('petugas.konfirmasi', $value->id) }}"><button
+                                                    class=" btn btn-xs btn-primary"
+                                                    onclick="return confirm('Apakah anda yakin ?')"><i class="fa fa-check">
+                                                        Konfirmasi</i></button></a> &nbsp;
+                                            <a href="{{ route('petugas.hapus', $value->id) }}"><button
+                                                    class=" btn btn-xs btn-danger"
+                                                    onclick="return confirm('Apakah anda ingin menghapus data ini ?')"><i
+                                                        class="fa fa-trash"> Hapus</i></button></a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Data Booking Selanjutnya</h3>
+                        <div class="box-tools pull-right">
+                            {{-- <button type="button" class="btn btn-info btn-md" data-toggle="modal"
+                                data-target="#modal-form-tambah-klinik"><i class="fa fa-plus"> Tambah Data
+                                </i></button> --}}
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive">
+                        <table class="table table-bordered table-striped" id="data-klinik">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama Pasien</th>
+                                    <th>No Handphone</th>
+                                    <th>Klinik</th>
+                                    <th>Service</th>
+                                    <th>Tanggal</th>
+                                    <th>Jam</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (@$nextBooking as $key => $value)
+                                    <tr>
+                                        <td>{{ @$value->id }}</td>
+                                        <td>{{ @$value->Pasien->name }}</td>
+                                        <td>{{ @$value->Pasien->no_hp }}</td>
+                                        <td>{{ @$value->Klinik->name }}</td>
+                                        <td>{{ @$value->Service->name }}</td>
+                                        <td>{{ @$value->tanggal }}</td>
+                                        <td>{{ @$value->jam }}</td>
+                                        <td>
+                                            <button class="btn btn-xs btn-warning btn-edit-klinik"><i class="fa fa-close">
+                                                    Cancel</i></button> &nbsp;
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {{-- <div class="modal fade" id="modal-form-tambah-klinik" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Form Tambah Data Klinik</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="#" method="post" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        <div class="form-group has-feedback">
+                            <label>Nama Klinik</label>
+                            <input type="text" name="name" class="form-control" placeholder="Nama Klinik Cabang"
+                                required>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label>Alamat</label>
+                            <textarea name="alamat" id="alamat" cols="3" rows="1" class="form-control" required></textarea>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label>No Telepon</label>
+                            <input type="number" name="no_tlpn" class="form-control" placeholder="No Telepon" required>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label>Link Google Map</label>
+                            <input type="text" name="gmap" class="form-control" placeholder="Google Map" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4 col-xs-offset-8">
+                                <button type="submit" class="btn btn-primary btn-block btn-flat">Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div> --}}
+    <div class="modal fade" id="modal-form-edit-klinik" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Form Ubah Data Klinik</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('petugas.cancel') }}" method="post" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        <div class="form-group has-feedback">
+                            <input type="hidden" name="id" readonly class="form-control" placeholder="ID" required>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label>Catatan</label>
+                            <textarea name="catatan" id="catatan" cols="3" rows="2" class="form-control" required></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-4 col-xs-offset-8">
+                                <button type="submit" class="btn btn-primary btn-block btn-flat">Simpan</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('javascript')
+    <script src="{{ asset('adminlte/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('adminlte/plugins/datatables/dataTables.bootstrap.min.js') }}"></script>
+    <script type="text/javascript">
+        var table = $('#data-klinik').DataTable();
+
+        $('#data-klinik').on('click', '.btn-edit-klinik', function() {
+            row = table.row($(this).closest('tr')).data();
+            console.log(row);
+            $('input[name=id]').val(row[0]);
+            $('#modal-form-edit-klinik').modal('show');
+        });
+
+        $('#modal-form-tambah-klinik').on('show.bs.modal', function() {
+            $('input[name=id]').val('');
+            $('textarea[name=alamat]').val('');
+            $('input[name=name]').val('');
+            $('input[name=no_tlpn]').val('');
+            $('input[name=gmap]').val('');
+        });
+
+        $(document).ready(function() {
+            $('.zoom').hover(function() {
+                $(this).addClass('transisi');
+            }, function() {
+                $(this).removeClass('transisi');
+            });
+        });
+    </script>
+    <script>
+        var tableBooking = $('#data-booking').DataTable();
+    </script>
+@endsection
